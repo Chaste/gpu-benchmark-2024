@@ -170,6 +170,7 @@ void PerformGPUSim(const double size_of_box, std::vector<ResultsRow>& results) {
     std::cout << "Starting GPU sim with box size: " << size_of_box << "\n";
     auto start_time = std::chrono::high_resolution_clock::now();
     
+    SimulationTime::Destroy();
     SimulationTime::Instance()->SetStartTime(0.0);
     unsigned cells_across = size_of_box * 1.52;
     double scaling = size_of_box/(double(cells_across-1));
@@ -195,7 +196,6 @@ void PerformGPUSim(const double size_of_box, std::vector<ResultsRow>& results) {
     cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes(), p_transit_type);
 
     NodeBasedCellPopulation<2> node_based_cell_population(mesh, cells);
-    //node_based_cell_population.AddCellPopulationCountWriter<CellProliferativeTypesCountWriter>();
 
     // Set up cell-based simulation
     OffLatticeSimulation<2> simulator(node_based_cell_population);
@@ -229,6 +229,7 @@ void PerformCPUSim(const double size_of_box, std::vector<ResultsRow>& results) {
     
     std::cout << "Starting CPU sim with box size: " << size_of_box << "\n";
     auto start_time = std::chrono::high_resolution_clock::now();
+    SimulationTime::Destroy();
     SimulationTime::Instance()->SetStartTime(0.0);
     unsigned cells_across = size_of_box * 1.52;
     double scaling = size_of_box/(double(cells_across-1));
@@ -254,7 +255,6 @@ void PerformCPUSim(const double size_of_box, std::vector<ResultsRow>& results) {
     cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes(), p_transit_type);
 
     NodeBasedCellPopulation<2> node_based_cell_population(mesh, cells);
-    //node_based_cell_population.AddCellPopulationCountWriter<CellProliferativeTypesCountWriter>();
 
     // Set up cell-based simulation
     OffLatticeSimulation<2> simulator(node_based_cell_population);
@@ -288,12 +288,11 @@ int main(int argc, char *argv[])
 {
     // This sets up PETSc and prints out copyright information, etc.
     ExecutableSupport::StandardStartup(&argc, &argv);
-    ExecutableSupport::StandardStartup(&argc, &argv);
     std::vector<double> box_sizes = {10.0, 20.0, 30.0, 40.0, 50.0, 100.0, 200.0, 300.0, 400.0, 500.0};
     std::vector<ResultsRow> results;
     for (auto box_size : box_sizes) {
-        PerformGPUSim(box_size, results);
         PerformCPUSim(box_size, results);
+        PerformGPUSim(box_size, results);
     }
     WriteResultsToFile(results, "results.txt");
     std::cout << "Benchmark complete\n";
