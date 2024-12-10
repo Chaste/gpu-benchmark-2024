@@ -33,63 +33,20 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-/**
- * @file
- *
- * This file gives an example of how you can create your own executable
- * in a user project.
- */
-
-#include <iostream>
-#include <string>
-
-#include "ExecutableSupport.hpp"
+#include "Hello_gpu-benchmark-2024.hpp"
 #include "Exception.hpp"
-#include "PetscTools.hpp"
-#include "PetscException.hpp"
 
-#include "Hello.hpp"
-
-int main(int argc, char *argv[])
+Hello_gpubenchmark2024::Hello_gpubenchmark2024(const std::string& rMessage)
+    : mMessage(rMessage)
 {
-    // This sets up PETSc and prints out copyright information, etc.
-    ExecutableSupport::StandardStartup(&argc, &argv);
+}
 
-    int exit_code = ExecutableSupport::EXIT_OK;
+std::string Hello_gpubenchmark2024::GetMessage()
+{
+    return mMessage;
+}
 
-    // You should put all the main code within a try-catch, to ensure that
-    // you clean up PETSc before quitting.
-    try
-    {
-        if (argc<2)
-        {
-            ExecutableSupport::PrintError("Usage: ExampleApp arguments ...", true);
-            exit_code = ExecutableSupport::EXIT_BAD_ARGUMENTS;
-        }
-        else
-        {
-            for (int i=1; i<argc; i++)
-            {
-                if (PetscTools::AmMaster())
-                {
-                    std::string arg_i(argv[i]);
-                    Hello world(arg_i);
-                    std::cout << "Argument " << i << " is " << world.GetMessage() << std::endl << std::flush;
-                }
-            }
-        }
-    }
-    catch (const Exception& e)
-    {
-        ExecutableSupport::PrintError(e.GetMessage());
-        exit_code = ExecutableSupport::EXIT_ERROR;
-    }
-
-    // Optional - write the machine info to file.
-    ExecutableSupport::WriteMachineInfoFile("machine_info");
-
-    // End by finalizing PETSc, and returning a suitable exit code.
-    // 0 means 'no error'
-    ExecutableSupport::FinalizePetsc();
-    return exit_code;
+void Hello_gpubenchmark2024::Complain(const std::string& rComplaint)
+{
+    EXCEPTION(rComplaint);
 }
